@@ -13,4 +13,7 @@ seaborn
 selene-sdk
 statsmodels
 umap-learn
-
+tqdm
+plotnine
+python-louvain
+python-igraph
