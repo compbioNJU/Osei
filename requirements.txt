@@ -17,3 +17,4 @@ tqdm
 plotnine
 python-louvain
 python-igraph
+bedtools
