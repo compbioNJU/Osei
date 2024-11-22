@@ -24,7 +24,23 @@ You can run the following program in the shell，Here's an example using rice.
 species=oryza_sativa         # Species name
 window_size=1024     # Window size
 step_size=128       # Slide step
+
+# Generating intervals...
+bedtools makewindows -g ../fasta/${species}.size -w ${window_size} -s ${step_size} > ${species}_${window_size}_${step_size}s_intervals.bed
+#Extracting sequences from genome...
+bedtools getfasta -fi ../fasta/${species}.fa -bed ${species}_${window_size}_${step_size}s_intervals.bed > ${species}_${window_size}_${step_size}s_intervals.fa
+#Converting sequences to single line format...
+awk '/^>/{if(seq) print seq; print; seq=""; next} {seq=seq$0} END{if(seq) print seq}' ${species}_${window_size}_${step_size}s_intervals.fa > ${species}_${window_size}_${step_size}s_intervals_single_line.fa
+#Filtering sequences...(There may be unassembled sequences)
+faFilter -minSize=${window_size} -maxN=0 ${species}_${window_size}_${step_size}s_intervals_single_line.fa stdout | \\
+awk '/^>/{if($0 ~ /Un/ || $0 ~ /Sy/) {skip=1} else {skip=0} } !/^>/ && !skip {print} /^>/ && !skip {print}' > ${species}_${window_size}_${step_size}s_intervals_single_line_filtered_temp.fa
+#Converting filtered sequences to single line format...
+awk '/^>/{if(seq) print seq; print; seq=""; next} {seq=seq$0} END{if(seq) print seq}' ${species}_${window_size}_${step_size}s_intervals_single_line_filtered_temp.fa > ${species}_${window_size}_${step_size}s_intervals_single_line_filtered.fa
+rm ${species}_${window_size}_${step_size}s_intervals_single_line_filtered_temp.fa
+#Generate bed files for analysis
+awk '/^>/{if(seq) print a[1] "\\t" a[2] "\\t" a[3] "\\t" header; header=$0; sub(/^>/, "", header); split(header, a, "[:-]"); seq=""; next} {seq=seq$0} END {if(seq) print a[1] "\\t" a[2] "\\t" a[3] "\\t" header}' ${species}_${window_size}_${step_size}s_intervals_single_line_filtered.fa > ${species}_${window_size}_${step_size}s_intervals_single_line_filtered.bed
 ```
+If you want to collect peak data yourself to train your own species, you need to do overlap on the processed genome bed file and the file of peak signals.
 ## Code for results
 The directories correspond to the following figures/analyses:
 -   `crossSpecies`:Predictions are made across species using the model and then the predictions are compared to predefined states.
