@@ -18,6 +18,13 @@ Some of the python notebooks also call R with rpy2, therefore the R dependencies
 [Osei](https://biobigdata.nju.edu.cn/Osei/home)
 
 **NOTE**:You can access our database for the data and model used in these analyses.
+## Steps in pre-processing the genome
+You can run the following program in the shell，Here's an example using rice.
+```bash
+species=oryza_sativa         # Species name
+window_size=1024     # Window size
+step_size=128       # Slide step
+```
 ## Code for results
 The directories correspond to the following figures/analyses:
 -   `crossSpecies`:Predictions are made across species using the model and then the predictions are compared to predefined states.
